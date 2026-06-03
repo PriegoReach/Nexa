@@ -1,10 +1,10 @@
-"""Tool de ENVÍO de correo con Gmail (P27).
+"""Tool de ENVÍO de correo con Gmail.
 
 EL PUNTO MÁS ALTO DE LA ESCALERA DE IRREVERSIBILIDAD del proyecto:
   - un correo enviado NO se deshace (un evento se borra; un correo ya llegó),
   - el daño es a una PERSONA REAL (un tercero), no a la propia cuenta,
-  - y el 7B redacta el CONTENIDO (prosa para un humano, no args estructurados).
-Por eso la confirmación NO es cosmética: es la única barrera entre "el 7B propuso"
+  - y el modelo redacta el CONTENIDO (prosa para un humano, no args estructurados).
+Por eso la confirmación NO es cosmética: es la única barrera entre "el modelo propuso"
 y "un correo equivocado llegó a alguien". send_email SOLO PROPONE; el envío real
 (perform_send_email) ocurre exclusivamente desde el registro CONFIRMABLE_ACTIONS
 tras un "sí" explícito del usuario.
@@ -12,11 +12,11 @@ tras un "sí" explícito del usuario.
 IDEMPOTENCIA — LADO EMISOR (obligado): la Gmail API users.messages.send NO admite
 clave de idempotencia de cliente (a diferencia de Calendar, que acepta un `id` y
 da 409 lado-receptor). Enviar el mismo raw dos veces entrega DOS correos. Por eso
-replicamos webhook_events (P22-B): registrar-primero en sent_emails con UNIQUE
-sobre idempotency_key; si choca, NO se reenvía. Sesgo a no-duplicar.
+registramos-primero en sent_emails con UNIQUE sobre idempotency_key; si choca, NO
+se reenvía. Sesgo a no-duplicar.
 
 httpx directo + email.message de stdlib (criterio del proyecto: nada de
-google-api-python-client pesado). Timeout explícito (lección P15).
+google-api-python-client pesado). Timeout explícito.
 """
 import asyncio
 import base64
@@ -56,9 +56,9 @@ def _run_async(coro):
 
 
 def _idempotency_key(to: str, subject: str, body: str) -> str:
-    """Clave sobre los VALORES normalizados (patrón P21/P22-B). Mismo correo
-    (mismo destinatario+asunto+cuerpo) -> misma clave -> el UNIQUE bloquea el
-    reenvío. A prueba de replay, no de correos legítimamente distintos."""
+    """Clave sobre los VALORES normalizados. Mismo correo (mismo
+    destinatario+asunto+cuerpo) -> misma clave -> el UNIQUE bloquea el reenvío.
+    A prueba de replay, no de correos legítimamente distintos."""
     basis = f"{to.strip().lower()}|{subject.strip().lower()}|{body.strip().lower()}"
     return hashlib.sha256(basis.encode("utf-8")).hexdigest()
 
@@ -91,13 +91,13 @@ def _build_mime(to: str, subject: str, body: str) -> str:
 
 @confirmable_action("send_email")
 async def perform_send_email(args: dict) -> str:
-    """El ENVÍO REAL del correo. Ejecutor del registro P27: firma (args: dict) -> str.
+    """El ENVÍO REAL del correo. Ejecutor confirmable: firma (args: dict) -> str.
     NO lo llama el modelo: lo invoca la rama de confirmación del orquestador tras un
     "sí". `args` trae {to, subject, body}.
 
-    Registrar-primero (P22-B): INSERT ON CONFLICT DO NOTHING. Si la clave ya existía
-    -> ese correo ya se envió -> NO reenviar. Si insertó -> enviar y registrar el
-    resultado real (sent/failed).
+    Registrar-primero: INSERT ON CONFLICT DO NOTHING. Si la clave ya existía -> ese
+    correo ya se envió -> NO reenviar. Si insertó -> enviar y registrar el resultado
+    real (sent/failed).
     """
     to = args["to"]
     subject = args.get("subject", "")
@@ -200,7 +200,7 @@ def send_email(to: str, subject: str, body: str) -> str:
                     "action": "send_email",
                     "args": {"to": to, "subject": subject, "body": body},
                     "description": description,
-                    "question": question,   # texto LITERAL para el override (P27)
+                    "question": question,   # texto LITERAL para el override
                 },
             )
         )

@@ -95,7 +95,7 @@ def update_task(task_id: int, status: str) -> str:
     return f"Tarea #{task_id} {estado_es}: {content}"
 
 
-# ---------- delete (CON confirmación asistida, Fase C / registro P26) ----------
+# ---------- delete (con confirmación asistida) ----------
 @confirmable_action("delete_task")
 async def perform_delete(args: dict) -> str:
     """Ejecuta el borrado REAL (DELETE...RETURNING + commit) y devuelve el mensaje
@@ -103,9 +103,9 @@ async def perform_delete(args: dict) -> str:
 
     NO es un @tool: la llama la rama de confirmación del orquestador tras un 'sí'
     del usuario (vía CONFIRMABLE_ACTIONS["delete_task"]), NUNCA el modelo directo.
-    Firma uniforme del registro P26: (args: dict) -> str. `args` trae {task_id}.
-    Si la fila ya no existía es no-op benigno (lección del 404-no-500 de P13): se
-    reporta como "ya no existía", no como error.
+    Firma uniforme: (args: dict) -> str. `args` trae {task_id}.
+    Si la fila ya no existía es no-op benigno: se reporta como "ya no existía", no
+    como error.
     """
     task_id = args["task_id"]
     async with worker_session() as session:
@@ -146,7 +146,7 @@ async def _propose_delete(task_id: int, conversation_id: Optional[int]) -> str:
                 "action": "delete_task",
                 "args": {"task_id": task_id},
                 "description": f"#{task_id} '{content}'",
-                "question": question,   # texto LITERAL para el override (P27)
+                "question": question,   # texto LITERAL para el override
             },
         )
     logger.info("delete_task proposed", extra={"task_id": task_id})

@@ -1,12 +1,8 @@
 """Re-ranking con cross-encoder: reordena los candidatos del retriever por relevancia fina.
 
-Carga bge-reranker-v2-m3 una vez (singleton, como el agente) en GPU y en fp16:
-halva los pesos (~2.3GB → ~1.1GB), sano en un card de 12GB que comparte VRAM con
-qwen2.5(8192)+nomic (verificado: ~5.3GB libres con el chat residente).
-
-El import de sentence_transformers/torch es LAZY dentro del singleton, a propósito:
-así el worker (que nunca rerankea) no arrastra torch al importar este módulo, y el
-coste de carga del modelo se paga solo en la primera búsqueda real, en api.
+Carga bge-reranker-v2-m3 una vez (singleton) en GPU y fp16. El import de
+sentence_transformers/torch es lazy dentro del singleton para que el worker (que
+nunca rerankea) no arrastre torch.
 """
 import logging
 
@@ -23,7 +19,7 @@ def _get_model():
 
         logger.info("loading reranker", extra={"event": "reranker_load", "model": _MODEL_NAME})
         model = CrossEncoder(_MODEL_NAME, device="cuda", max_length=1024)
-        model.model.half()  # fp16 en GPU
+        model.model.half()
         _model = model
         logger.info("reranker loaded", extra={"event": "reranker_ready"})
     return _model

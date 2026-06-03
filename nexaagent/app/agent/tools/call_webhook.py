@@ -19,8 +19,8 @@ def _run_async(coro):
 
 
 def _webhook_url() -> str | None:
-    # La URL del webhook es una CREDENCIAL externa -> mismo mecanismo que S:
-    # archivo en /run/secrets/, con fallback a env var para desarrollo.
+    # La URL del webhook es una CREDENCIAL externa: archivo en /run/secrets/, con
+    # fallback a env var para desarrollo.
     path = "/run/secrets/webhook_url"
     if os.path.exists(path):
         with open(path, "r", encoding="utf-8") as f:
@@ -29,14 +29,14 @@ def _webhook_url() -> str | None:
 
 
 def _event_key(message: str) -> str:
-    # Clave del evento sobre el contenido normalizado (patrón P21).
+    # Clave del evento sobre el contenido normalizado.
     return hashlib.sha256(message.strip().lower().encode("utf-8")).hexdigest()
 
 
 async def _register_and_send(message: str, url: str) -> str:
     key = _event_key(message)
     async with worker_session() as session:
-        # PASO 1: registrar ANTES de disparar (sesgo a no-duplicar; ver bitácora).
+        # PASO 1: registrar ANTES de disparar (sesgo a no-duplicar).
         # Si la clave ya existe -> ON CONFLICT DO NOTHING -> row None -> replay, no redisparar.
         result = await session.execute(
             text(

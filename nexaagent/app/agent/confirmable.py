@@ -1,9 +1,9 @@
-"""Registro de ACCIONES CONFIRMABLES (P26).
+"""Registro de ACCIONES CONFIRMABLES.
 
-P24 introdujo el flujo de confirmación asistida con UNA sola acción (delete_task)
-ejecutada de forma HARDCODEADA en el orquestador. P26 generaliza: cualquier acción
-irreversible (delete_task, create_calendar_event, mañana gmail...) propone -> guarda
-un intent agnóstico en pending.py -> y, tras un "sí", se ejecuta buscándola AQUÍ.
+Cualquier acción irreversible (delete_task, create_calendar_event, send_email...)
+propone -> guarda un intent agnóstico en pending.py -> y, tras un "sí", se ejecuta
+buscándola AQUÍ. El orquestador (_handle_confirmation) NO conoce a ninguna acción
+por nombre: hace CONFIRMABLE_ACTIONS[intent["action"]](intent["args"]).
 
 Contrato uniforme de un ejecutor:
     async def perform_fn(args: dict) -> str
@@ -11,11 +11,6 @@ Contrato uniforme de un ejecutor:
         - DEVUELVE el mensaje de resultado YA LISTO para el usuario (string),
         - NUNCA propaga excepción al orquestador (mismo criterio que las tools):
           un error de la acción se traduce a un string legible.
-
-El orquestador (_handle_confirmation) NO conoce a ninguna acción por nombre: tras
-un "sí" hace CONFIRMABLE_ACTIONS[intent["action"]](intent["args"]). La heurística
-sí/no/ambiguo de P24 NO cambia — lo único que cambia es QUÉ se ejecuta (lookup en
-vez de hardcode).
 
 Cada ejecutor se registra con el decorador @confirmable_action("nombre") en su
 propio módulo (manage_tasks.py, calendar.py). El registro se puebla al importar

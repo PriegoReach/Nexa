@@ -1,28 +1,27 @@
-"""Tools de Google Drive (P28): LISTAR archivos e INGESTARLOS al RAG.
+"""Tools de Google Drive: LISTAR archivos e INGESTARLOS al RAG.
 
 Drive aquí es READ-ONLY y reversible (solo lee/descarga para indexar) -> a
-diferencia de la Fase 2 (Calendar/Gmail), NO necesita confirmación. Es la pieza
-que CONECTA el OAuth de Google (P25-27) con el pipeline RAG de la Fase 1: traer un
-archivo de Drive y meterlo por el mismo ingest_document que ya usa /documents/upload.
+diferencia de Calendar/Gmail, NO necesita confirmación. Es la pieza que CONECTA el
+OAuth de Google con el pipeline RAG: traer un archivo de Drive y meterlo por el
+mismo ingest_document que ya usa /documents/upload.
 
 PASOS SEPARABLES (no es magia de un paso): list_drive_files busca, ingest_drive_file
-trae+indexa, y preguntar es RAG normal (search_knowledge_base, ya existe) sobre lo
-ya ingestado.
+trae+indexa, y preguntar es RAG normal (search_knowledge_base) sobre lo ya ingestado.
 
 Dos caminos de ingesta según el mimeType:
   - BINARIO (application/pdf, text/*): files.get?alt=media -> bytes tal cual.
   - GOOGLE DOC NATIVO (vnd.google-apps.document): files.export?mimeType=text/plain
     -> Google lo convierte a texto (no se puede descargar 'tal cual', es nativo).
-  - Sheets/Slides/imágenes/otros: NO soportados en P28 (formato no-texto / OCR es
+  - Sheets/Slides/imágenes/otros: NO soportados (formato no-texto / OCR es
     extensión futura). Mensaje claro, nunca excepción.
 
 El puente al pipeline: ingest_document recibe un PATH y decide por el sufijo
 (.pdf->PdfReader, otro->read_text), así que escribimos lo traído a un archivo
 temporal con la extensión correcta y lo borramos al terminar.
 
-httpx directo con timeout (P15), sin google-api-python-client. Cross-loop (P2/P24):
-todo el I/O de BD ocurre vía worker_session (engine NullPool atado al loop efímero
-del ThreadPoolExecutor de la tool).
+httpx directo con timeout, sin google-api-python-client. Cross-loop: todo el I/O
+de BD ocurre vía worker_session (engine NullPool atado al loop efímero del
+ThreadPoolExecutor de la tool).
 """
 import asyncio
 import logging
@@ -159,7 +158,7 @@ async def _fetch_content(client: httpx.AsyncClient, file_id: str, mime: str,
         )
         resp.raise_for_status()
         return resp.content, ".txt"
-    # Sheets, Slides, imágenes, Office binario, etc.: no soportados en P28.
+    # Sheets, Slides, imágenes, Office binario, etc.: no soportados.
     return (f"El archivo es de tipo '{_friendly_type(mime)}' y aún no puedo "
             "ingestarlo. Por ahora solo soporto PDF, texto y Google Docs.")
 
@@ -167,7 +166,7 @@ async def _fetch_content(client: httpx.AsyncClient, file_id: str, mime: str,
 async def _get_or_create_document(drive_file_id: str, name: str) -> tuple[int, bool]:
     """Reusa el document_id si este drive_file_id ya se ingestó (idempotencia de
     re-ingesta: ingest_document borrará y reemplazará sus chunks). Si no, crea la
-    fila vía ORM (aplica el default created_at, lección P19)."""
+    fila vía ORM (aplica el default created_at)."""
     async with worker_session() as session:
         existing = await session.execute(
             text("SELECT id FROM documents WHERE drive_file_id = :fid"),

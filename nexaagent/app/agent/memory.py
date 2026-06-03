@@ -55,8 +55,8 @@ async def append(conversation_id: int, role: str, content: str) -> None:
         await client.ltrim(key, -_MAX_TURNS, -1)
         await client.expire(key, 60 * 60 * 24)  # 24h TTL for short-term memory
     except RedisError as exc:
-        # No relanza: Postgres ya tiene el mensaje durable (Parte 6). Solo se
-        # pierde la copia rápida en Redis de este turno.
+        # No relanza: Postgres ya tiene el mensaje durable. Solo se pierde la copia
+        # rápida en Redis de este turno.
         logger.warning(
             "redis unavailable on append, skipping short-term cache",
             extra={

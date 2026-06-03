@@ -1,20 +1,17 @@
-"""Tools de Google Calendar.
+"""Tools de Google Calendar: LECTURA (list_calendar_events) y ESCRITURA
+(create_calendar_event), la primera acción externa irreversible.
 
-P25: LECTURA (list_calendar_events).
-P26: ESCRITURA (create_calendar_event) — la PRIMERA acción externa irreversible.
-     Converge tres piezas: OAuth (P25) + confirmación asistida (P24) + idempotencia
-     (P22-B). Crear un evento NO es directo: la tool PROPONE (guarda un intent en
-     pending y devuelve la pregunta de confirmación) y el INSERT real solo ocurre
-     tras un "sí", vía el registro CONFIRMABLE_ACTIONS (confirmable.py).
+Crear un evento NO es directo: la tool PROPONE (guarda un intent en pending y
+devuelve la pregunta de confirmación) y el INSERT real solo ocurre tras un "sí",
+vía el registro CONFIRMABLE_ACTIONS (confirmable.py).
 
-Idempotencia LADO-RECEPTOR (P26): el event_id se deriva DETERMINÍSTICAMENTE de la
+Idempotencia LADO-RECEPTOR: el event_id se deriva DETERMINÍSTICAMENTE de la
 intención (summary+start+end). Insertar dos veces con el mismo id -> Google
-responde 409 y NO duplica. No hace falta una tabla propia (eso reintroduciría el
-commit distribuido que P22-B curó); Google es el árbitro de la unicidad.
+responde 409 y NO duplica; Google es el árbitro de la unicidad (sin tabla propia).
 
 Molde compartido con el resto de tools: puente _run_async (la tool es síncrona
-para langchain pero el I/O es async), httpx con timeout (P15), y SIEMPRE devuelve
-un string legible — nunca propaga una excepción al agente. El caso "no hay cuenta
+para langchain pero el I/O es async), httpx con timeout, y SIEMPRE devuelve un
+string legible — nunca propaga una excepción al agente. El caso "no hay cuenta
 conectada" se traduce a un mensaje claro, no a un 500.
 """
 import asyncio
@@ -32,7 +29,7 @@ from langchain_core.tools import tool
 
 from app.agent import pending
 from app.agent.confirmable import confirmable_action
-from app.agent.tools.create_task import _resolve_due  # reuso del resolver de fechas (P26)
+from app.agent.tools.create_task import _resolve_due  # reuso del resolver de fechas
 from app.core.config import settings
 from app.core.log_context import conversation_id_var
 from app.integrations.google_oauth import NoGoogleAccount, get_valid_token
@@ -132,7 +129,7 @@ def list_calendar_events(max_results: int = 10) -> str:
     return _run_async(_list_events(max_results))
 
 
-# ==================== CREAR EVENTO (P26) ====================
+# ==================== CREAR EVENTO ====================
 # Formato esperado tras el parseo: la tool resuelve la fecha (NL es / ISO) con el
 # mismo _resolve_due de create_task y la hora con _resolve_time (abajo), y arma un
 # datetime LOCAL sin offset (Google lo interpreta en settings.calendar_timezone).
@@ -150,7 +147,7 @@ def _strip(s: str) -> str:
 
 def _resolve_time(phrase: str) -> Optional[tuple[int, int]]:
     """Resuelve una hora ('3pm', '15:00', '9', '8:30am') a (hora24, minuto).
-    Determinístico (el 7B falla con aritmética). None si no se entiende."""
+    Determinístico (el LLM falla con aritmética). None si no se entiende."""
     if not phrase:
         return None
     s = _strip(phrase).replace(".", "").replace(" ", "")
@@ -201,7 +198,7 @@ def _fmt_when(iso_str: str) -> str:
 async def perform_create_event(args: dict) -> str:
     """El INSERT REAL en Google Calendar (events.insert sobre 'primary').
 
-    Ejecutor del registro P26: firma (args: dict) -> str. `args` trae
+    Ejecutor confirmable: firma (args: dict) -> str. `args` trae
     {summary, start, end, timezone} ya resueltos por la tool. NO lo llama el modelo:
     lo invoca la rama de confirmación del orquestador tras un "sí".
 
@@ -237,8 +234,7 @@ async def perform_create_event(args: dict) -> str:
     except httpx.HTTPStatusError as exc:
         code = exc.response.status_code
         if code == 409:
-            # El id ya existe -> la intención ya se materializó. NO es error y NO
-            # duplica: la cura de P22-B aplicada a un efecto externo real.
+            # El id ya existe -> la intención ya se materializó. NO es error y NO duplica.
             logger.info("calendar event already exists (idempotent 409)",
                         extra={"event_id": event_id})
             return f"El evento '{summary}' ya estaba creado (no lo dupliqué)."
@@ -259,8 +255,7 @@ async def perform_create_event(args: dict) -> str:
 async def _propose_event(summary: str, date_phrase: str, time_phrase: str,
                          duration_minutes: int, conversation_id: Optional[int]) -> str:
     """Resuelve fecha+hora, arma el intent y lo guarda en pending. NO crea el
-    evento: este es el punto de convergencia con P24 — la acción externa pasa por
-    confirmación igual que delete_task."""
+    evento: la acción externa pasa por confirmación igual que delete_task."""
     resolved = _resolve_due(date_phrase, date.today())
     if resolved is None:
         return (f"No pude entender la fecha '{date_phrase}' (o ya pasó). "
@@ -291,7 +286,7 @@ async def _propose_event(summary: str, date_phrase: str, time_phrase: str,
                 "action": "create_calendar_event",
                 "args": args,
                 "description": description,
-                "question": question,   # texto LITERAL para el override (P27)
+                "question": question,   # texto LITERAL para el override
             },
         )
     logger.info("create_calendar_event proposed", extra={"event_id": _event_id(summary, start, end)})

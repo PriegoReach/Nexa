@@ -153,14 +153,14 @@ async def _maybe_extract_memories(conversation_id: int) -> None:
     ),
     stop=stop_after_attempt(2),                       # 2 intentos totales = 1 reintento
     wait=wait_exponential(multiplier=0.5, max=2),     # ~0.5s, tope 2s; corto a propósito
-    before_sleep=before_sleep_log(logger, logging.WARNING),  # loguea el reintento (Fase 1)
+    before_sleep=before_sleep_log(logger, logging.WARNING),  # loguea el reintento
     reraise=True,                                     # tras agotar, relanza la EXCEPCIÓN ORIGINAL
 )
 async def _ainvoke_with_retry(agent, messages):
     return await agent.ainvoke({"messages": messages})
 
 
-# --- Confirmación asistida (Fase C): heurística determinística sí/no/ambiguo -----
+# --- Confirmación asistida: heurística determinística sí/no/ambiguo -----
 # Coincidencia EXACTA sobre el texto normalizado (lower, sin acentos, sin
 # puntuación). A propósito conservadora: solo un sí/no claro coincide; CUALQUIER
 # otra cosa (incl. "no sé", una pregunta) cae en AMBIGUO -> no ejecuta, no limpia
@@ -188,9 +188,8 @@ async def _handle_confirmation(conversation_id: int, user_input: str, intent: di
     (delete_task, create_calendar_event, ...). Determinística; lo ambiguo SIEMPRE
     falla hacia no-ejecutar (no actúa, conserva la intención, repregunta).
 
-    P26: ya no menciona ninguna acción por nombre — tras un "sí" busca el ejecutor
-    en CONFIRMABLE_ACTIONS[intent["action"]]. La heurística sí/no/ambiguo NO cambia
-    respecto a P24; lo único que cambia es QUÉ se ejecuta (lookup en vez de hardcode).
+    No menciona ninguna acción por nombre: tras un "sí" busca el ejecutor en
+    CONFIRMABLE_ACTIONS[intent["action"]].
     """
     action = intent.get("action")
     description = intent.get("description", "la acción pendiente")
@@ -256,15 +255,15 @@ async def run_agent(conversation_id: int, user_input: str) -> str:
         raise UpstreamUnavailable() from exc
     answer = result["messages"][-1].content
 
-    # --- Override "propuesta sin modelo" (P27) -------------------------------
+    # --- Override "propuesta sin modelo" -------------------------------------
     # Al entrar NO había pending (si lo hubiera, habríamos ido por la rama de
     # confirmación y no llegaríamos aquí). Si tras la llamada al modelo SÍ hay un
     # pending con `question`, una tool acaba de PROPONER una acción confirmable.
-    # DESCARTAMOS la narración del modelo (el 7B tiende a decir "ya lo hice" al
-    # proponer, P24/P25/P26) y devolvemos la pregunta LITERAL que guardó la tool.
-    # El modelo sigue eligiendo la tool (su trabajo bueno); su prosa de la propuesta
-    # NO se muestra. Garantiza "lo mostrado = lo que se ejecutará" — crítico para un
-    # correo, donde el modelo podría alterar destinatario/cuerpo al narrar.
+    # DESCARTAMOS la narración del modelo (tiende a decir "ya lo hice" al proponer) y
+    # devolvemos la pregunta LITERAL que guardó la tool. El modelo sigue eligiendo la
+    # tool; su prosa de la propuesta NO se muestra. Garantiza "lo mostrado = lo que se
+    # ejecutará" — crítico para un correo, donde el modelo podría alterar
+    # destinatario/cuerpo al narrar.
     new_pending = await pending.get_pending(conversation_id)
     if new_pending is not None and new_pending.get("question"):
         answer = new_pending["question"]
@@ -340,7 +339,7 @@ async def run_agent_stream(conversation_id: int, user_input: str):
     )
 
     full_answer: list[str] = []
-    # Override "propuesta sin modelo" (P27), versión streaming: si una tool PROPONE
+    # Override "propuesta sin modelo", versión streaming: si una tool PROPONE
     # una acción confirmable, capturamos su pregunta LITERAL y, desde ese punto,
     # SUPRIMIMOS la narración del modelo (no transmitimos su paráfrasis). Al cerrar
     # se emite el texto literal como respuesta autoritativa.
@@ -384,7 +383,7 @@ async def run_agent_stream(conversation_id: int, user_input: str):
 
     if proposal_question is not None:
         # Reemplazo autoritativo: el usuario ve y aprueba el texto LITERAL, no la
-        # prosa del 7B. (El modelo ya hizo su trabajo bueno: elegir la tool.)
+        # prosa del modelo. (El modelo ya hizo su trabajo: elegir la tool.)
         answer = proposal_question
         logger.info("proposal override applied (no-model proposal, stream)")
         yield {"type": "token", "value": answer}

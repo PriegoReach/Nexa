@@ -1,14 +1,13 @@
-"""Intención pendiente de confirmación (Fase C — confirmación asistida).
+"""Intención pendiente de confirmación (confirmación asistida).
 
-Una acción IRREVERSIBLE propuesta (hoy solo delete_task) se guarda aquí en Redis,
-APARTE del historial (clave nexa:pending:<conv_id>, no nexa:memory:<id>), con TTL
-corto (efímera: o se confirma pronto, o caduca). El turno siguiente la lee para
-saber que es una respuesta a la propuesta y no un mensaje normal.
+Una acción IRREVERSIBLE propuesta (delete_task, create_calendar_event, send_email...)
+se guarda aquí en Redis, APARTE del historial (clave nexa:pending:<conv_id>, no
+nexa:memory:<id>), con TTL corto (efímera: o se confirma pronto, o caduca). El turno
+siguiente la lee para saber que es una respuesta a la propuesta y no un mensaje normal.
 
-Degradación idéntica al patrón de memory.py: si Redis cae, se loguea WARNING y se
-degrada con gracia (NO revienta). Y para una acción DESTRUCTIVA, la degradación es
-FAIL-SAFE: sin intención visible, el turno de confirmación no ejecuta nada -> ante
-Redis caído, NO se borra. Fallar hacia no-actuar es lo correcto aquí.
+Si Redis cae, se degrada con gracia (NO revienta). Y para una acción DESTRUCTIVA la
+degradación es FAIL-SAFE: sin intención visible, el turno de confirmación no ejecuta
+nada -> ante Redis caído, NO se borra. Fallar hacia no-actuar es lo correcto aquí.
 """
 import json
 import logging

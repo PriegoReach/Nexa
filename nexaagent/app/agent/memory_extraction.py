@@ -10,11 +10,10 @@ from app.rag.embeddings import get_embeddings
 
 logger = logging.getLogger("nexa.memory")
 
-# --- Prompt de extracción (Parte 13: hechos atómicos) ----------------------
-# Antes (Parte 6) el prompt aceptaba hechos compuestos. Resultado en Parte 11:
-# qwen2.5 combinó "atún los jueves" y "Wenceslao" en un único hecho, perdiendo
-# "Wenceslao" cuando dedup omitió el conjunto. La regla ahora es: UN dato por
-# línea. Los ejemplos guían al modelo más que cualquier "DEBES".
+# --- Prompt de extracción: hechos atómicos ---------------------------------
+# Un dato por línea, a propósito: combinar varios hechos en una frase hace que el
+# dedup semántico omita el conjunto entero y se pierdan datos. Los ejemplos guían
+# al modelo mejor que cualquier "DEBES".
 _EXTRACTION_PROMPT = """Tu tarea es extraer hechos duraderos y memorables de la \
 siguiente conversación, para recordarlos en el futuro.
 
@@ -54,7 +53,7 @@ Ahora extrae los hechos atómicos de esta conversación:
 
 Hechos atómicos (uno por línea):"""
 
-# Umbral calibrado con sonda en Parte 11.
+# Umbral calibrado empíricamente (distancia coseno): por debajo => duplicado.
 DEDUP_DISTANCE_THRESHOLD = 0.15
 
 

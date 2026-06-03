@@ -31,7 +31,7 @@ def _strip(s: str) -> str:
 
 def _resolve_due(phrase: str, today: date) -> Optional[date]:
     """Resuelve una fecha en lenguaje natural (es) o ISO a un date real.
-    Determinístico: la aritmética la hace el código, no el LLM (el 7B falla).
+    Determinístico: la aritmética la hace el código, no el LLM.
     Devuelve None si no se entiende O si la fecha ya pasó (señal de calendario
     viejo del modelo, p. ej. un ISO de 2023) — para no guardar basura en silencio.
     """
@@ -70,8 +70,7 @@ def _run_async(coro):
 def _idempotency_key(content: str, due: Optional[date]) -> str:
     # Clave sobre VALORES NORMALIZADOS, no sobre la frase cruda: 'el viernes' y
     # 'este viernes' resuelven al mismo due -> misma clave -> no duplican.
-    # A prueba de replay (el retry no-idempotente de la P15), no de repeticiones
-    # legítimas en el tiempo.
+    # A prueba de replay, no de repeticiones legítimas en el tiempo.
     basis = f"{content.strip().lower()}|{due.isoformat() if due else ''}"
     return hashlib.sha256(basis.encode("utf-8")).hexdigest()
 
@@ -104,7 +103,7 @@ async def _insert_task(content: str, due: Optional[date]) -> tuple[int, bool]:
             return task_id, False
         task_id = row[0]
         logger.info(
-            "create_task executed",                       # rastro para el experimento del retry
+            "create_task executed",
             extra={"task_id": task_id, "due_date": str(due), "idempotency_key": key},
         )
         return task_id, True

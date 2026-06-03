@@ -16,7 +16,7 @@ def _read_file(path: str) -> str:
     return p.read_text(encoding="utf-8", errors="ignore")
 
 
-# --- Chunking estructural (Parte 10) -------------------------------------
+# --- Chunking estructural -------------------------------------
 
 def _is_header(lines: list[str], i: int) -> bool:
     line = lines[i].strip()
@@ -95,8 +95,7 @@ def _enrich_chunks(raw: str, filename: str) -> list[str]:
 async def ingest_document(document_id: int, file_path: str) -> int:
     """Parse -> chunk (estructural + contexto) -> embed -> store.
 
-    Usa worker_session() del helper compartido (Parte 13): engine NullPool
-    propio, atado al loop actual de la tarea Celery.
+    Usa worker_session(): engine NullPool propio, atado al loop actual de la tarea Celery.
     """
     raw = _read_file(file_path)
     chunks = _enrich_chunks(raw, file_path)
@@ -106,9 +105,9 @@ async def ingest_document(document_id: int, file_path: str) -> int:
     vectors = get_embeddings().embed_documents(chunks)
 
     async with worker_session() as session:
-        # Idempotencia (Parte 14): limpiar cualquier chunk previo de ESTE documento
-        # antes de insertar. Correr la tarea N veces == correrla 1 vez. Si la
-        # transacción aborta, ni se borró ni se insertó: el doc queda como estaba.
+        # Idempotencia: limpiar cualquier chunk previo de ESTE documento antes de
+        # insertar. Correr la tarea N veces == correrla 1 vez. Si la transacción
+        # aborta, ni se borró ni se insertó: el doc queda como estaba.
         await session.execute(
             text("DELETE FROM document_chunks WHERE document_id = :doc_id"),
             {"doc_id": document_id},
