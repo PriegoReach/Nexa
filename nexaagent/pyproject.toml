@@ -1,0 +1,65 @@
+[project]
+name = "nexaagent"
+version = "0.1.0"
+description = "Autonomous AI agent for business automation"
+requires-python = ">=3.11"
+
+# Versiones FIJAS (==) tomadas del `pip freeze` del contenedor en funcionamiento.
+# Motivo: en la Parte 1, `langchain>=0.2` trajo la 1.x y reorganizó la API por
+# completo (Error 4). Fijar con == hace que un rebuild traiga exactamente lo que
+# funciona hoy. Para subir una dependencia a propósito: cambiar el número aquí.
+dependencies = [
+    # --- API / web ---
+    "fastapi==0.136.3",
+    "uvicorn[standard]==0.47.0",
+    "python-multipart==0.0.29",
+
+    # --- Configuración / validación ---
+    "pydantic==2.13.4",
+    "pydantic-settings==2.14.1",
+
+    # --- Base de datos ---
+    "sqlalchemy[asyncio]==2.0.49",
+    "asyncpg==0.31.0",               # driver async (la app)
+    "psycopg2-binary==2.9.10",       # driver SYNC (solo Alembic; wheel precompilado)
+    "pgvector==0.4.2",
+    "alembic==1.18.4",
+
+    # --- Workers / colas ---
+    "redis==7.4.0",
+    "celery==5.6.3",
+
+    # --- LangChain / agente (la causa del Error 4: fijar es crítico) ---
+    "langchain==1.3.1",
+    "langchain-core==1.4.0",         # antes transitiva; se fija porque rompe entre mayores
+    "langchain-ollama==1.1.0",
+    "langchain-community==0.4.2",
+    "langchain-text-splitters==1.1.2",
+    "langgraph==1.2.1",              # corre por debajo de create_agent
+
+    # --- RAG / utilidades ---
+    "pypdf==6.12.1",
+    "httpx==0.28.1",                 # herramienta HTTP del agente
+    "tenacity==9.1.4",
+    # --- Seguridad / autenticación ---
+    "pyjwt==2.10.1",
+
+    # --- Re-ranking (P18): cross-encoder en GPU dentro de api ---
+    # Rompe la racha de "cero deps": arrastra torch (CUDA ~2-3GB). Inevitable con
+    # un cross-encoder. La wheel de torch en linux/PyPI ya trae CUDA 12.x bundled
+    # (sin system CUDA). Pin de ST en 3.x: API estable de CrossEncoder (.predict,
+    # .model, max_length) — el refactor mayor llegó después.
+    "sentence-transformers==3.3.1",
+    "torch==2.5.1",
+
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "pytest-asyncio>=0.23", "ruff>=0.4"]
+
+[tool.ruff]
+line-length = 100
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]

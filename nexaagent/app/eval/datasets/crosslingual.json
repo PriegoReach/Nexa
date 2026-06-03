@@ -1,0 +1,8 @@
+[
+  {"pregunta": "datacenters de GFN en Estados Unidos", "doc_id": 20, "etiqueta": "P28-real(US)"},
+  {"pregunta": "¿en qué ciudades de Estados Unidos hay centros de datos?", "doc_id": 20, "etiqueta": "US-ciudades"},
+  {"pregunta": "¿dónde están los datacenters en Europa?", "doc_id": 20, "etiqueta": "Europa"},
+  {"pregunta": "¿hay un centro de datos en Fráncfort, Alemania?", "doc_id": 20, "etiqueta": "Frankfurt"},
+  {"pregunta": "ubicación de los servidores en la costa este de Estados Unidos", "doc_id": 20, "etiqueta": "costa-este"},
+  {"pregunta": "lista de centros de datos en Reino Unido y Francia", "doc_id": 20, "etiqueta": "UK-Francia"}
+]

@@ -1,0 +1,48 @@
+# ──────────────────────────────────────────────────────────────
+# NexaAgent — .gitignore raíz (repo abarca backend + frontend + Docs)
+# Nota: nexaagent/.gitignore sigue aplicando a su subárbol; este lo complementa.
+# ──────────────────────────────────────────────────────────────
+
+# ── SECRETOS Y CONFIG (NUNCA versionar valores reales) ──
+nexaagent/secrets/
+**/.env
+**/.env.*
+!**/.env.example
+
+# ── PYTHON ──
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+venv/
+.venv/
+# cobertura de tests
+.coverage
+coverage.xml
+htmlcov/
+
+# ── NODE / FRONTEND ──
+node_modules/
+frontend/dist/
+frontend/dist-ssr/
+frontend/.vite/
+*.local
+# info de build incremental de TypeScript
+*.tsbuildinfo
+
+# ── HERRAMIENTAS DE CLAUDE / AGENTES ──
+.agents/
+.claude/
+skills-lock.json
+
+# ── DATOS / RUNTIME ──
+uploads/
+*.log
+
+# ── SO / EDITOR ──
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

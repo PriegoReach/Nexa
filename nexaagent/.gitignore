@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.env
+.venv/
+uploads/
+.pytest_cache/
+
+# Docker secrets: valores REALES (jwt, auth, postgres, webhook_url). NUNCA versionar.
+# Si algún día quieres dejar constancia de qué secretos existen, versiona una
+# carpeta de ejemplo aparte (p. ej. secrets.example/ con valores placeholder).
+secrets/

@@ -1,0 +1,178 @@
+services:
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      # Contexto por defecto del servidor (RTX 4070 12 GB tiene margen de sobra).
+      - OLLAMA_CONTEXT_LENGTH=8192
+    # Acceso a la GPU NVIDIA (RTX 4070) via runtime nvidia de Docker.
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  init-ollama:
+    image: ollama/ollama:latest
+    env_file: .env
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+    depends_on:
+      ollama:
+        condition: service_healthy
+    volumes:
+      - ./init-ollama.sh:/init-ollama.sh
+    entrypoint: ["/bin/bash", "/init-ollama.sh"]
+    restart: "no"
+
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-nexa}
+      # P23: contraseña vía archivo (nativo de la imagen postgres), no env.
+      # En un volumen ya inicializado se ignora (el rol ya existe); su valor
+      # debe coincidir con el del rol existente ('nexa') — esto reubica, no rota.
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+      POSTGRES_DB: ${POSTGRES_DB:-nexaagent}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    secrets:
+      - postgres_password
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-nexa} -d ${POSTGRES_DB:-nexaagent}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  # Receptor de webhooks de PRUEBA/DEMO para verificar call_webhook (P22, Bloque B).
+  # Reusa la imagen api (build: ., capas cacheadas) y monta el script; en la red de
+  # compose se resuelve como 'webhook-receiver'. NO es producción — la URL real de
+  # webhook se cambia en secrets/webhook_url.txt, no aquí (la gracia del mecanismo de S).
+  webhook-receiver:
+    build: .
+    command: python /webhook_receiver.py
+    volumes:
+      - ./webhook_receiver.py:/webhook_receiver.py
+
+  api:
+    build: .
+    env_file: .env
+    environment:
+      # Caché del modelo del reranker (bge-reranker-v2-m3) en un volumen, para no
+      # re-descargarlo de HuggingFace en cada recreación del contenedor.
+      - HF_HOME=/root/.cache/huggingface
+    # GPU para el cross-encoder de re-ranking (Opción A, P18): el reranker corre
+    # DENTRO del proceso api, en CUDA. Mismo bloque nvidia que ollama; sin esto
+    # device="cuda" no ve la GPU (verificado: nvidia-smi daba exit 127 en api).
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    ports:
+      - "8000:8000"
+    depends_on:
+      init-ollama:
+        condition: service_completed_successfully
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    volumes:
+      - ./uploads:/app/uploads
+      - ./app:/app/app
+      - ./alembic:/app/alembic
+      - ./alembic.ini:/app/alembic.ini
+      - hf_cache:/root/.cache/huggingface
+    secrets:
+      - jwt_secret
+      - auth_password
+      - webhook_url
+      - postgres_password
+      - google_client_id
+      - google_client_secret
+
+  worker:
+    build: .
+    command: celery -A app.workers.celery_app.celery_app worker --loglevel=info
+    env_file: .env
+    depends_on:
+      init-ollama:
+        condition: service_completed_successfully
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    volumes:
+      - ./uploads:/app/uploads
+      - ./app:/app/app
+      - ./alembic:/app/alembic
+      - ./alembic.ini:/app/alembic.ini
+    secrets:
+      - jwt_secret
+      - auth_password
+      - postgres_password
+
+  # Servicio efímero solo para tests. Se lanza con:
+  #   docker compose run --rm tests
+  # Construye con dev deps (pytest) y apunta a una BD aparte (nexaagent_test).
+  tests:
+    build:
+      context: .
+      args:
+        INSTALL_DEV: "true"
+    env_file: .env
+    environment:
+      # conftest fuerza DATABASE_URL a <db>_test; estas quedan explícitas igual.
+      - ENVIRONMENT=test
+      - AUTH_PASSWORD=test-password
+      - JWT_SECRET=test-secret-not-used-in-prod-0123456789abcdef0123456789abcdef
+    depends_on:
+      db:
+        condition: service_healthy   # NO depende de ollama/redis: los tests no los tocan
+    volumes:
+      - ./app:/app/app
+      - ./alembic:/app/alembic
+      - ./alembic.ini:/app/alembic.ini
+      - ./tests:/app/tests
+      - ./pyproject.toml:/app/pyproject.toml
+    command: ["pytest", "-q"]
+
+secrets:
+  jwt_secret:
+    file: ./secrets/jwt_secret.txt
+  auth_password:
+    file: ./secrets/auth_password.txt
+  webhook_url:
+    file: ./secrets/webhook_url.txt
+  postgres_password:
+    file: ./secrets/postgres_password.txt
+  google_client_id:
+    file: ./secrets/google_client_id.txt
+  google_client_secret:
+    file: ./secrets/google_client_secret.txt
+
+volumes:
+  pgdata:
+  ollama_data:
+  hf_cache:

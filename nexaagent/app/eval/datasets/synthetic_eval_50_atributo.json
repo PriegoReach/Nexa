@@ -1,0 +1,502 @@
+[
+  {
+    "pregunta": "¿cuál es el código del proyecto del sector energía cuyo responsable es Ana Ruiz?",
+    "huella": "SYN-001-X1",
+    "proyecto": "energía/Ana Ruiz"
+  },
+  {
+    "pregunta": "codigo de autorizacion del proyecto del sector energía a cargo de Ana Ruiz",
+    "huella": "SYN-001-X1",
+    "proyecto": "energía/Ana Ruiz"
+  },
+  {
+    "pregunta": "¿cuál es el código del proyecto del sector salud cuyo responsable es Luis Ruiz?",
+    "huella": "SYN-002-X2",
+    "proyecto": "salud/Luis Ruiz"
+  },
+  {
+    "pregunta": "codigo de autorizacion del proyecto del sector salud a cargo de Luis Ruiz",
+    "huella": "SYN-002-X2",
+    "proyecto": "salud/Luis Ruiz"
+  },
+  {
+    "pregunta": "¿cuál es el código del proyecto del sector finanzas cuyo responsable es Marta Ruiz?",
+    "huella": "SYN-003-X3",
+    "proyecto": "finanzas/Marta Ruiz"
+  },
+  {
+    "pregunta": "codigo de autorizacion del proyecto del sector finanzas a cargo de Marta Ruiz",
+    "huella": "SYN-003-X3",
+    "proyecto": "finanzas/Marta Ruiz"
+  },
+  {
+    "pregunta": "¿cuál es el código del proyecto del sector agroindustria cuyo responsable es Pedro Ruiz?",
+    "huella": "SYN-004-X4",
+    "proyecto": "agroindustria/Pedro Ruiz"
+  },
+  {
+    "pregunta": "codigo de autorizacion del proyecto del sector agroindustria a cargo de Pedro Ruiz",
+    "huella": "SYN-004-X4",
+    "proyecto": "agroindustria/Pedro Ruiz"
+  },
+  {
+    "pregunta": "¿cuál es el código del proyecto del sector telecomunicaciones cuyo responsable es Sara Ruiz?",
+    "huella": "SYN-005-X5",
+    "proyecto": "telecomunicaciones/Sara Ruiz"
+  },
+  {
+    "pregunta": "codigo de autorizacion del proyecto del sector telecomunicaciones a cargo de Sara Ruiz",
+    "huella": "SYN-005-X5",
+    "proyecto": "telecomunicaciones/Sara Ruiz"
+  },
+  {
+    "pregunta": "¿cuál es el código del proyecto del sector manufactura cuyo responsable es Tomás Ruiz?",
+    "huella": "SYN-006-X6",
+    "proyecto": "manufactura/Tomás Ruiz"
+  },
+  {
+    "pregunta": "codigo de autorizacion del proyecto del sector manufactura a cargo de Tomás Ruiz",
+    "huella": "SYN-006-X6",
+    "proyecto": "manufactura/Tomás Ruiz"
+  },
+  {
+    "pregunta": "¿cuál es el código del proyecto del sector turismo cuyo responsable es Elena Ruiz?",
+    "huella": "SYN-007-X7",
+    "proyecto": "turismo/Elena Ruiz"
+  },
+  {
+    "pregunta": "codigo de autorizacion del proyecto del sector turismo a cargo de Elena Ruiz",
+    "huella": "SYN-007-X7",
+    "proyecto": "turismo/Elena Ruiz"
+  },
+  {
+    "pregunta": "¿cuál es el código del proyecto del sector educación cuyo responsable es Iván Ruiz?",
+    "huella": "SYN-008-X8",
+    "proyecto": "educación/Iván Ruiz"
+  },
+  {
+    "pregunta": "codigo de autorizacion del proyecto del sector educación a cargo de Iván Ruiz",
+    "huella": "SYN-008-X8",
+    "proyecto": "educación/Iván Ruiz"
+  },
+  {
+    "pregunta": "¿cuál es el código del proyecto del sector minería cuyo responsable es Nora Ruiz?",
+    "huella": "SYN-009-X9",
+    "proyecto": "minería/Nora Ruiz"
+  },
+  {
+    "pregunta": "codigo de autorizacion del proyecto del sector minería a cargo de Nora Ruiz",
+    "huella": "SYN-009-X9",
+    "proyecto": "minería/Nora Ruiz"
+  },
+  {
+    "pregunta": "¿cuál es el código del proyecto del sector logística cuyo responsable es Hugo Ruiz?",
+    "huella": "SYN-010-X0",
+    "proyecto": "logística/Hugo Ruiz"
+  },
+  {
+    "pregunta": "codigo de autorizacion del proyecto del sector logística a cargo de Hugo Ruiz",
+    "huella": "SYN-010-X0",
+    "proyecto": "logística/Hugo Ruiz"
+  },
+  {
+    "pregunta": "¿cuál es el código del proyecto del sector energía cuyo responsable es Ana Sáez?",
+    "huella": "SYN-011-X1",
+    "proyecto": "energía/Ana Sáez"
+  },
+  {
+    "pregunta": "codigo de autorizacion del proyecto del sector energía a cargo de Ana Sáez",
+    "huella": "SYN-011-X1",
+    "proyecto": "energía/Ana Sáez"
+  },
+  {
+    "pregunta": "¿cuál es el código del proyecto del sector salud cuyo responsable es Luis Sáez?",
+    "huella": "SYN-012-X2",
+    "proyecto": "salud/Luis Sáez"
+  },
+  {
+    "pregunta": "codigo de autorizacion del proyecto del sector salud a cargo de Luis Sáez",
+    "huella": "SYN-012-X2",
+    "proyecto": "salud/Luis Sáez"
+  },
+  {
+    "pregunta": "¿cuál es el código del proyecto del sector finanzas cuyo responsable es Marta Sáez?",
+    "huella": "SYN-013-X3",
+    "proyecto": "finanzas/Marta Sáez"
+  },
+  {
+    "pregunta": "codigo de autorizacion del proyecto del sector finanzas a cargo de Marta Sáez",
+    "huella": "SYN-013-X3",
+    "proyecto": "finanzas/Marta Sáez"
+  },
+  {
+    "pregunta": "¿cuál es el código del proyecto del sector agroindustria cuyo responsable es Pedro Sáez?",
+    "huella": "SYN-014-X4",
+    "proyecto": "agroindustria/Pedro Sáez"
+  },
+  {
+    "pregunta": "codigo de autorizacion del proyecto del sector agroindustria a cargo de Pedro Sáez",
+    "huella": "SYN-014-X4",
+    "proyecto": "agroindustria/Pedro Sáez"
+  },
+  {
+    "pregunta": "¿cuál es el código del proyecto del sector telecomunicaciones cuyo responsable es Sara Sáez?",
+    "huella": "SYN-015-X5",
+    "proyecto": "telecomunicaciones/Sara Sáez"
+  },
+  {
+    "pregunta": "codigo de autorizacion del proyecto del sector telecomunicaciones a cargo de Sara Sáez",
+    "huella": "SYN-015-X5",
+    "proyecto": "telecomunicaciones/Sara Sáez"
+  },
+  {
+    "pregunta": "¿cuál es el código del proyecto del sector manufactura cuyo responsable es Tomás Sáez?",
+    "huella": "SYN-016-X6",
+    "proyecto": "manufactura/Tomás Sáez"
+  },
+  {
+    "pregunta": "codigo de autorizacion del proyecto del sector manufactura a cargo de Tomás Sáez",
+    "huella": "SYN-016-X6",
+    "proyecto": "manufactura/Tomás Sáez"
+  },
+  {
+    "pregunta": "¿cuál es el código del proyecto del sector turismo cuyo responsable es Elena Sáez?",
+    "huella": "SYN-017-X7",
+    "proyecto": "turismo/Elena Sáez"
+  },
+  {
+    "pregunta": "codigo de autorizacion del proyecto del sector turismo a cargo de Elena Sáez",
+    "huella": "SYN-017-X7",
+    "proyecto": "turismo/Elena Sáez"
+  },
+  {
+    "pregunta": "¿cuál es el código del proyecto del sector educación cuyo responsable es Iván Sáez?",
+    "huella": "SYN-018-X8",
+    "proyecto": "educación/Iván Sáez"
+  },
+  {
+    "pregunta": "codigo de autorizacion del proyecto del sector educación a cargo de Iván Sáez",
+    "huella": "SYN-018-X8",
+    "proyecto": "educación/Iván Sáez"
+  },
+  {
+    "pregunta": "¿cuál es el código del proyecto del sector minería cuyo responsable es Nora Sáez?",
+    "huella": "SYN-019-X9",
+    "proyecto": "minería/Nora Sáez"
+  },
+  {
+    "pregunta": "codigo de autorizacion del proyecto del sector minería a cargo de Nora Sáez",
+    "huella": "SYN-019-X9",
+    "proyecto": "minería/Nora Sáez"
+  },
+  {
+    "pregunta": "¿cuál es el código del proyecto del sector logística cuyo responsable es Hugo Sáez?",
+    "huella": "SYN-020-X0",
+    "proyecto": "logística/Hugo Sáez"
+  },
+  {
+    "pregunta": "codigo de autorizacion del proyecto del sector logística a cargo de Hugo Sáez",
+    "huella": "SYN-020-X0",
+    "proyecto": "logística/Hugo Sáez"
+  },
+  {
+    "pregunta": "¿cuál es el código del proyecto del sector energía cuyo responsable es Ana Gil?",
+    "huella": "SYN-021-X1",
+    "proyecto": "energía/Ana Gil"
+  },
+  {
+    "pregunta": "codigo de autorizacion del proyecto del sector energía a cargo de Ana Gil",
+    "huella": "SYN-021-X1",
+    "proyecto": "energía/Ana Gil"
+  },
+  {
+    "pregunta": "¿cuál es el código del proyecto del sector salud cuyo responsable es Luis Gil?",
+    "huella": "SYN-022-X2",
+    "proyecto": "salud/Luis Gil"
+  },
+  {
+    "pregunta": "codigo de autorizacion del proyecto del sector salud a cargo de Luis Gil",
+    "huella": "SYN-022-X2",
+    "proyecto": "salud/Luis Gil"
+  },
+  {
+    "pregunta": "¿cuál es el código del proyecto del sector finanzas cuyo responsable es Marta Gil?",
+    "huella": "SYN-023-X3",
+    "proyecto": "finanzas/Marta Gil"
+  },
+  {
+    "pregunta": "codigo de autorizacion del proyecto del sector finanzas a cargo de Marta Gil",
+    "huella": "SYN-023-X3",
+    "proyecto": "finanzas/Marta Gil"
+  },
+  {
+    "pregunta": "¿cuál es el código del proyecto del sector agroindustria cuyo responsable es Pedro Gil?",
+    "huella": "SYN-024-X4",
+    "proyecto": "agroindustria/Pedro Gil"
+  },
+  {
+    "pregunta": "codigo de autorizacion del proyecto del sector agroindustria a cargo de Pedro Gil",
+    "huella": "SYN-024-X4",
+    "proyecto": "agroindustria/Pedro Gil"
+  },
+  {
+    "pregunta": "¿cuál es el código del proyecto del sector telecomunicaciones cuyo responsable es Sara Gil?",
+    "huella": "SYN-025-X5",
+    "proyecto": "telecomunicaciones/Sara Gil"
+  },
+  {
+    "pregunta": "codigo de autorizacion del proyecto del sector telecomunicaciones a cargo de Sara Gil",
+    "huella": "SYN-025-X5",
+    "proyecto": "telecomunicaciones/Sara Gil"
+  },
+  {
+    "pregunta": "¿cuál es el código del proyecto del sector manufactura cuyo responsable es Tomás Gil?",
+    "huella": "SYN-026-X6",
+    "proyecto": "manufactura/Tomás Gil"
+  },
+  {
+    "pregunta": "codigo de autorizacion del proyecto del sector manufactura a cargo de Tomás Gil",
+    "huella": "SYN-026-X6",
+    "proyecto": "manufactura/Tomás Gil"
+  },
+  {
+    "pregunta": "¿cuál es el código del proyecto del sector turismo cuyo responsable es Elena Gil?",
+    "huella": "SYN-027-X7",
+    "proyecto": "turismo/Elena Gil"
+  },
+  {
+    "pregunta": "codigo de autorizacion del proyecto del sector turismo a cargo de Elena Gil",
+    "huella": "SYN-027-X7",
+    "proyecto": "turismo/Elena Gil"
+  },
+  {
+    "pregunta": "¿cuál es el código del proyecto del sector educación cuyo responsable es Iván Gil?",
+    "huella": "SYN-028-X8",
+    "proyecto": "educación/Iván Gil"
+  },
+  {
+    "pregunta": "codigo de autorizacion del proyecto del sector educación a cargo de Iván Gil",
+    "huella": "SYN-028-X8",
+    "proyecto": "educación/Iván Gil"
+  },
+  {
+    "pregunta": "¿cuál es el código del proyecto del sector minería cuyo responsable es Nora Gil?",
+    "huella": "SYN-029-X9",
+    "proyecto": "minería/Nora Gil"
+  },
+  {
+    "pregunta": "codigo de autorizacion del proyecto del sector minería a cargo de Nora Gil",
+    "huella": "SYN-029-X9",
+    "proyecto": "minería/Nora Gil"
+  },
+  {
+    "pregunta": "¿cuál es el código del proyecto del sector logística cuyo responsable es Hugo Gil?",
+    "huella": "SYN-030-X0",
+    "proyecto": "logística/Hugo Gil"
+  },
+  {
+    "pregunta": "codigo de autorizacion del proyecto del sector logística a cargo de Hugo Gil",
+    "huella": "SYN-030-X0",
+    "proyecto": "logística/Hugo Gil"
+  },
+  {
+    "pregunta": "¿cuál es el código del proyecto del sector energía cuyo responsable es Ana Lima?",
+    "huella": "SYN-031-X1",
+    "proyecto": "energía/Ana Lima"
+  },
+  {
+    "pregunta": "codigo de autorizacion del proyecto del sector energía a cargo de Ana Lima",
+    "huella": "SYN-031-X1",
+    "proyecto": "energía/Ana Lima"
+  },
+  {
+    "pregunta": "¿cuál es el código del proyecto del sector salud cuyo responsable es Luis Lima?",
+    "huella": "SYN-032-X2",
+    "proyecto": "salud/Luis Lima"
+  },
+  {
+    "pregunta": "codigo de autorizacion del proyecto del sector salud a cargo de Luis Lima",
+    "huella": "SYN-032-X2",
+    "proyecto": "salud/Luis Lima"
+  },
+  {
+    "pregunta": "¿cuál es el código del proyecto del sector finanzas cuyo responsable es Marta Lima?",
+    "huella": "SYN-033-X3",
+    "proyecto": "finanzas/Marta Lima"
+  },
+  {
+    "pregunta": "codigo de autorizacion del proyecto del sector finanzas a cargo de Marta Lima",
+    "huella": "SYN-033-X3",
+    "proyecto": "finanzas/Marta Lima"
+  },
+  {
+    "pregunta": "¿cuál es el código del proyecto del sector agroindustria cuyo responsable es Pedro Lima?",
+    "huella": "SYN-034-X4",
+    "proyecto": "agroindustria/Pedro Lima"
+  },
+  {
+    "pregunta": "codigo de autorizacion del proyecto del sector agroindustria a cargo de Pedro Lima",
+    "huella": "SYN-034-X4",
+    "proyecto": "agroindustria/Pedro Lima"
+  },
+  {
+    "pregunta": "¿cuál es el código del proyecto del sector telecomunicaciones cuyo responsable es Sara Lima?",
+    "huella": "SYN-035-X5",
+    "proyecto": "telecomunicaciones/Sara Lima"
+  },
+  {
+    "pregunta": "codigo de autorizacion del proyecto del sector telecomunicaciones a cargo de Sara Lima",
+    "huella": "SYN-035-X5",
+    "proyecto": "telecomunicaciones/Sara Lima"
+  },
+  {
+    "pregunta": "¿cuál es el código del proyecto del sector manufactura cuyo responsable es Tomás Lima?",
+    "huella": "SYN-036-X6",
+    "proyecto": "manufactura/Tomás Lima"
+  },
+  {
+    "pregunta": "codigo de autorizacion del proyecto del sector manufactura a cargo de Tomás Lima",
+    "huella": "SYN-036-X6",
+    "proyecto": "manufactura/Tomás Lima"
+  },
+  {
+    "pregunta": "¿cuál es el código del proyecto del sector turismo cuyo responsable es Elena Lima?",
+    "huella": "SYN-037-X7",
+    "proyecto": "turismo/Elena Lima"
+  },
+  {
+    "pregunta": "codigo de autorizacion del proyecto del sector turismo a cargo de Elena Lima",
+    "huella": "SYN-037-X7",
+    "proyecto": "turismo/Elena Lima"
+  },
+  {
+    "pregunta": "¿cuál es el código del proyecto del sector educación cuyo responsable es Iván Lima?",
+    "huella": "SYN-038-X8",
+    "proyecto": "educación/Iván Lima"
+  },
+  {
+    "pregunta": "codigo de autorizacion del proyecto del sector educación a cargo de Iván Lima",
+    "huella": "SYN-038-X8",
+    "proyecto": "educación/Iván Lima"
+  },
+  {
+    "pregunta": "¿cuál es el código del proyecto del sector minería cuyo responsable es Nora Lima?",
+    "huella": "SYN-039-X9",
+    "proyecto": "minería/Nora Lima"
+  },
+  {
+    "pregunta": "codigo de autorizacion del proyecto del sector minería a cargo de Nora Lima",
+    "huella": "SYN-039-X9",
+    "proyecto": "minería/Nora Lima"
+  },
+  {
+    "pregunta": "¿cuál es el código del proyecto del sector logística cuyo responsable es Hugo Lima?",
+    "huella": "SYN-040-X0",
+    "proyecto": "logística/Hugo Lima"
+  },
+  {
+    "pregunta": "codigo de autorizacion del proyecto del sector logística a cargo de Hugo Lima",
+    "huella": "SYN-040-X0",
+    "proyecto": "logística/Hugo Lima"
+  },
+  {
+    "pregunta": "¿cuál es el código del proyecto del sector energía cuyo responsable es Ana Vega?",
+    "huella": "SYN-041-X1",
+    "proyecto": "energía/Ana Vega"
+  },
+  {
+    "pregunta": "codigo de autorizacion del proyecto del sector energía a cargo de Ana Vega",
+    "huella": "SYN-041-X1",
+    "proyecto": "energía/Ana Vega"
+  },
+  {
+    "pregunta": "¿cuál es el código del proyecto del sector salud cuyo responsable es Luis Vega?",
+    "huella": "SYN-042-X2",
+    "proyecto": "salud/Luis Vega"
+  },
+  {
+    "pregunta": "codigo de autorizacion del proyecto del sector salud a cargo de Luis Vega",
+    "huella": "SYN-042-X2",
+    "proyecto": "salud/Luis Vega"
+  },
+  {
+    "pregunta": "¿cuál es el código del proyecto del sector finanzas cuyo responsable es Marta Vega?",
+    "huella": "SYN-043-X3",
+    "proyecto": "finanzas/Marta Vega"
+  },
+  {
+    "pregunta": "codigo de autorizacion del proyecto del sector finanzas a cargo de Marta Vega",
+    "huella": "SYN-043-X3",
+    "proyecto": "finanzas/Marta Vega"
+  },
+  {
+    "pregunta": "¿cuál es el código del proyecto del sector agroindustria cuyo responsable es Pedro Vega?",
+    "huella": "SYN-044-X4",
+    "proyecto": "agroindustria/Pedro Vega"
+  },
+  {
+    "pregunta": "codigo de autorizacion del proyecto del sector agroindustria a cargo de Pedro Vega",
+    "huella": "SYN-044-X4",
+    "proyecto": "agroindustria/Pedro Vega"
+  },
+  {
+    "pregunta": "¿cuál es el código del proyecto del sector telecomunicaciones cuyo responsable es Sara Vega?",
+    "huella": "SYN-045-X5",
+    "proyecto": "telecomunicaciones/Sara Vega"
+  },
+  {
+    "pregunta": "codigo de autorizacion del proyecto del sector telecomunicaciones a cargo de Sara Vega",
+    "huella": "SYN-045-X5",
+    "proyecto": "telecomunicaciones/Sara Vega"
+  },
+  {
+    "pregunta": "¿cuál es el código del proyecto del sector manufactura cuyo responsable es Tomás Vega?",
+    "huella": "SYN-046-X6",
+    "proyecto": "manufactura/Tomás Vega"
+  },
+  {
+    "pregunta": "codigo de autorizacion del proyecto del sector manufactura a cargo de Tomás Vega",
+    "huella": "SYN-046-X6",
+    "proyecto": "manufactura/Tomás Vega"
+  },
+  {
+    "pregunta": "¿cuál es el código del proyecto del sector turismo cuyo responsable es Elena Vega?",
+    "huella": "SYN-047-X7",
+    "proyecto": "turismo/Elena Vega"
+  },
+  {
+    "pregunta": "codigo de autorizacion del proyecto del sector turismo a cargo de Elena Vega",
+    "huella": "SYN-047-X7",
+    "proyecto": "turismo/Elena Vega"
+  },
+  {
+    "pregunta": "¿cuál es el código del proyecto del sector educación cuyo responsable es Iván Vega?",
+    "huella": "SYN-048-X8",
+    "proyecto": "educación/Iván Vega"
+  },
+  {
+    "pregunta": "codigo de autorizacion del proyecto del sector educación a cargo de Iván Vega",
+    "huella": "SYN-048-X8",
+    "proyecto": "educación/Iván Vega"
+  },
+  {
+    "pregunta": "¿cuál es el código del proyecto del sector minería cuyo responsable es Nora Vega?",
+    "huella": "SYN-049-X9",
+    "proyecto": "minería/Nora Vega"
+  },
+  {
+    "pregunta": "codigo de autorizacion del proyecto del sector minería a cargo de Nora Vega",
+    "huella": "SYN-049-X9",
+    "proyecto": "minería/Nora Vega"
+  },
+  {
+    "pregunta": "¿cuál es el código del proyecto del sector logística cuyo responsable es Hugo Vega?",
+    "huella": "SYN-050-X0",
+    "proyecto": "logística/Hugo Vega"
+  },
+  {
+    "pregunta": "codigo de autorizacion del proyecto del sector logística a cargo de Hugo Vega",
+    "huella": "SYN-050-X0",
+    "proyecto": "logística/Hugo Vega"
+  }
+]
