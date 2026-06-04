@@ -64,6 +64,11 @@ class Settings(BaseSettings):
     redis_url: str = "redis://redis:6379/0"
     celery_broker_url: str = "redis://redis:6379/1"
 
+    # --- Servicio TTS (XTTS-v2, contenedor propio) ----------------------
+    # El backend hace de proxy autenticado; el servicio tts no se expone fuera
+    # de la red interna de compose. Override por env si cambia host/puerto.
+    tts_base_url: str = "http://tts:8000"
+
     # --- OAuth Google (P25) ---------------------------------------------
     # client_id/secret de un cliente OAuth tipo "Desktop app" (estáticos ->
     # van en secrets, mismo patrón que jwt_secret/postgres_password). Los

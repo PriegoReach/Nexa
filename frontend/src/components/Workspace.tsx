@@ -6,6 +6,7 @@ import {
   listConversations,
   type ConversationSummary,
   type GoogleStatus,
+  type Voice,
 } from "../api";
 import { Sidebar } from "./Sidebar";
 import { Chat } from "./Chat";
@@ -40,6 +41,10 @@ export function Workspace({ token, onSignOut, onSessionExpired }: WorkspaceProps
   const [googleStatus, setGoogleStatus] = useState<GoogleStatus | null>(null);
   const [connectionsOpen, setConnectionsOpen] = useState(false);
   const [documentsOpen, setDocumentsOpen] = useState(false);
+
+  // Voz de lectura (TTS). Vive aquí, no en Chat, para que la elección persista
+  // cuando el panel de chat se remonta al cambiar de conversación.
+  const [voice, setVoice] = useState<Voice>("ana");
 
   const loadGoogleStatus = useCallback(async () => {
     try {
@@ -148,6 +153,8 @@ export function Workspace({ token, onSignOut, onSessionExpired }: WorkspaceProps
         key={paneKey}
         token={token}
         conversationId={selectedConvId}
+        voice={voice}
+        onVoiceChange={setVoice}
         onConversationActivity={onConversationActivity}
         onSessionExpired={onSessionExpired}
         onToggleSidebar={() => setSidebarOpen((v) => !v)}

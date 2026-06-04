@@ -289,6 +289,8 @@ body {
 }
 .chat-titlebar__title {
   margin: 0;
+  flex: 1;
+  min-width: 0;
   font-size: 14.5px;
   font-weight: 600;
   letter-spacing: -0.01em;
@@ -296,6 +298,46 @@ body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* --- Selector de voz (header del chat) ------------------------------------- */
+.voice-select {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  background: var(--surface-sunken);
+  border: 1px solid var(--border);
+  border-radius: 9999px;
+}
+.voice-select__icon {
+  display: inline-flex;
+  align-items: center;
+  color: var(--text-faint);
+  padding: 0 3px 0 6px;
+}
+.voice-select__opt {
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: transparent;
+  border: none;
+  padding: 4px 11px;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition:
+    background-color 0.16s ease,
+    color 0.16s ease;
+}
+.voice-select__opt:hover {
+  color: var(--text);
+}
+.voice-select__opt.is-active {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 .chat-titlebar__menu {
   display: none; /* solo en móvil (ver media query) */
@@ -365,6 +407,44 @@ body {
   color: var(--text);
   white-space: pre-wrap;
   word-wrap: break-word;
+}
+
+/* --- Botón "leer en voz alta" (por mensaje del agente, bajo demanda) -------- */
+.msg__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2px;
+}
+.speak-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-faint);
+  border-radius: 7px;
+  cursor: pointer;
+  transition:
+    background-color 0.16s ease,
+    color 0.16s ease,
+    border-color 0.16s ease;
+}
+.speak-btn:hover {
+  background: var(--surface);
+  color: var(--text);
+  border-color: var(--border);
+}
+.speak-btn.is-active {
+  background: var(--surface);
+  color: var(--text);
+  border-color: var(--border);
+}
+.speak-error {
+  font-size: 12px;
+  color: var(--text-faint);
 }
 
 /* --- Indicador "pensando" (no spinner genérico) ---------------------------- */

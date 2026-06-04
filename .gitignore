@@ -41,6 +41,9 @@ skills-lock.json
 uploads/
 *.log
 
+# ── EXPLORACIÓN TEMPORAL (prueba aislada de XTTS-v2: venv pesado + .token) ──
+_tts_probe/
+
 # ── SO / EDITOR ──
 .DS_Store
 Thumbs.db

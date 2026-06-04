@@ -1,13 +1,17 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { FormEvent, KeyboardEvent } from "react";
-import { ApiError, getConversation, streamChat } from "../api";
-import type { MessageItem } from "../api";
+import { ApiError, getConversation, streamChat, synthesize, VOICES } from "../api";
+import type { MessageItem, Voice } from "../api";
 
 interface ChatProps {
   token: string;
   // Conversación a abrir al montar (null = conversación nueva). El padre fuerza
   // un remontaje (key) al cambiarla, así que "montar" equivale a "abrir esta".
   conversationId: number | null;
+  // Voz de lectura (TTS) y su setter — viven en el padre para persistir entre
+  // remontajes del panel.
+  voice: Voice;
+  onVoiceChange: (voice: Voice) => void;
   // Se llama al terminar cada turno con el id vigente: el padre refresca la lista
   // (orden + último mensaje) y marca la conversación activa. NO provoca remontaje.
   onConversationActivity: (id: number) => void;
@@ -128,9 +132,97 @@ function endTool(parts: AgentPart[], tool: string): AgentPart[] {
   return parts;
 }
 
+// --- Reproducción por voz (TTS bajo demanda) --------------------------------
+// Un solo audio sonando a la vez. `speak(id, text)` alterna: si ese mensaje ya
+// está activo (generando o sonando), para; si no, genera y reproduce. Estados
+// expuestos por id de mensaje para que cada fila pinte el suyo.
+type SpeakStatus = "loading" | "playing";
+
+function useSpeech(token: string, voice: Voice, onSessionExpired: () => void) {
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const urlRef = useRef<string | null>(null);
+  const activeRef = useRef<string | null>(null); // guarda contra respuestas tardías
+  const [speakingId, setSpeakingId] = useState<string | null>(null);
+  const [status, setStatus] = useState<SpeakStatus | null>(null);
+  const [errorId, setErrorId] = useState<string | null>(null);
+
+  const teardown = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.onended = null;
+      audioRef.current.onerror = null;
+      audioRef.current.src = "";
+      audioRef.current = null;
+    }
+    if (urlRef.current) {
+      URL.revokeObjectURL(urlRef.current);
+      urlRef.current = null;
+    }
+  }, []);
+
+  const stop = useCallback(() => {
+    activeRef.current = null;
+    teardown();
+    setSpeakingId(null);
+    setStatus(null);
+  }, [teardown]);
+
+  const speak = useCallback(
+    async (id: string, text: string) => {
+      if (activeRef.current === id) {
+        stop(); // toggle: ya activo -> parar
+        return;
+      }
+      teardown(); // corta cualquier lectura previa (una sola a la vez)
+      activeRef.current = id;
+      setErrorId(null);
+      setSpeakingId(id);
+      setStatus("loading");
+      try {
+        const blob = await synthesize(token, text, voice);
+        if (activeRef.current !== id) return; // se canceló/cambió mientras generaba
+        const url = URL.createObjectURL(blob);
+        urlRef.current = url;
+        const audio = new Audio(url);
+        audioRef.current = audio;
+        audio.onended = () => stop();
+        audio.onerror = () => {
+          setErrorId(id);
+          stop();
+        };
+        await audio.play();
+        if (activeRef.current === id) setStatus("playing");
+      } catch (err) {
+        if (err instanceof ApiError && err.status === 401) {
+          stop();
+          onSessionExpired();
+          return;
+        }
+        if (activeRef.current === id) {
+          setErrorId(id);
+          stop();
+        }
+      }
+    },
+    [token, voice, stop, teardown, onSessionExpired],
+  );
+
+  // Cambiar de voz detiene lo que esté sonando (la próxima lectura usa la nueva).
+  useEffect(() => {
+    stop();
+  }, [voice, stop]);
+
+  // Limpieza al desmontar el panel.
+  useEffect(() => () => teardown(), [teardown]);
+
+  return { speak, speakingId, status, errorId };
+}
+
 export function Chat({
   token,
   conversationId,
+  voice,
+  onVoiceChange,
   onConversationActivity,
   onSessionExpired,
   onToggleSidebar,
@@ -142,6 +234,8 @@ export function Chat({
   const [historyError, setHistoryError] = useState<string | null>(null);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
+
+  const speech = useSpeech(token, voice, onSessionExpired);
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -320,6 +414,7 @@ export function Chat({
           <MenuIcon />
         </button>
         <h1 className="chat-titlebar__title">{displayTitle}</h1>
+        <VoiceSelector value={voice} onChange={onVoiceChange} />
       </header>
 
       <div className="messages" ref={scrollRef} onScroll={handleScroll} aria-live="polite">
@@ -339,7 +434,15 @@ export function Chat({
               m.role === "user" ? (
                 <UserRow key={m.id} content={m.content} />
               ) : (
-                <AgentRow key={m.id} message={m} sending={sending} onRespond={respondToProposal} />
+                <AgentRow
+                  key={m.id}
+                  message={m}
+                  sending={sending}
+                  onRespond={respondToProposal}
+                  onSpeak={speech.speak}
+                  speakState={speech.speakingId === m.id ? speech.status : null}
+                  speakError={speech.errorId === m.id}
+                />
               ),
             )}
           </div>
@@ -393,10 +496,16 @@ function AgentRow({
   message,
   sending,
   onRespond,
+  onSpeak,
+  speakState,
+  speakError,
 }: {
   message: AgentMessage;
   sending: boolean;
   onRespond: (messageId: string, confirm: boolean) => void;
+  onSpeak: (id: string, text: string) => void;
+  speakState: SpeakStatus | null;
+  speakError: boolean;
 }) {
   let lastTextIndex = -1;
   message.parts.forEach((p, i) => {
@@ -404,6 +513,15 @@ function AgentRow({
   });
   const showLeadingThinking =
     message.streaming && message.parts.length === 0 && !message.error;
+
+  // Texto leíble = solo las partes de texto (sin pasos de herramienta). El botón
+  // de leer aparece cuando el turno terminó y hay texto, no durante el streaming.
+  const speakText = message.parts
+    .filter((p): p is TextPart => p.kind === "text")
+    .map((p) => p.text)
+    .join(" ")
+    .trim();
+  const canSpeak = !message.streaming && !message.error && speakText.length > 0;
 
   return (
     <div className="msg msg--agent">
@@ -425,6 +543,39 @@ function AgentRow({
           </p>
         );
       })}
+
+      {canSpeak && (
+        <div className="msg__actions">
+          <button
+            className={`speak-btn${speakState ? " is-active" : ""}`}
+            type="button"
+            onClick={() => onSpeak(message.id, speakText)}
+            aria-label={
+              speakState === "loading"
+                ? "Generando audio"
+                : speakState === "playing"
+                  ? "Detener lectura"
+                  : "Leer en voz alta"
+            }
+            title={
+              speakState === "loading"
+                ? "Generando audio…"
+                : speakState === "playing"
+                  ? "Detener"
+                  : "Leer en voz alta"
+            }
+          >
+            {speakState === "loading" ? (
+              <Spinner />
+            ) : speakState === "playing" ? (
+              <StopIcon />
+            ) : (
+              <SpeakerIcon />
+            )}
+          </button>
+          {speakError && <span className="speak-error">No se pudo leer.</span>}
+        </div>
+      )}
 
       {message.proposal && (
         <ProposalCard
@@ -565,7 +716,63 @@ function EmptyState() {
   );
 }
 
+// Selector de voz (control segmentado en el header del chat). Sobrio: dos pastillas
+// Ana/Alma; la activa resalta. La elección se usa para todas las lecturas.
+function VoiceSelector({
+  value,
+  onChange,
+}: {
+  value: Voice;
+  onChange: (voice: Voice) => void;
+}) {
+  return (
+    <div className="voice-select" role="group" aria-label="Voz de lectura">
+      <span className="voice-select__icon" aria-hidden="true">
+        <SpeakerIcon />
+      </span>
+      {VOICES.map((v) => (
+        <button
+          key={v.id}
+          type="button"
+          className={`voice-select__opt${value === v.id ? " is-active" : ""}`}
+          onClick={() => onChange(v.id)}
+          aria-pressed={value === v.id}
+        >
+          {v.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 /* --- Iconos: SVG primitivos, trazo uniforme (sin librerías ni emojis) --- */
+
+function SpeakerIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M11 5 6 9H3v6h3l5 4V5z"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M15.5 8.5a5 5 0 0 1 0 7M18 6a8 8 0 0 1 0 12"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function StopIcon() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor" />
+    </svg>
+  );
+}
 
 function MenuIcon() {
   return (

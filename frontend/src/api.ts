@@ -276,3 +276,48 @@ export function deleteDocument(
 ): Promise<{ deleted: boolean; document_id: number }> {
   return authed(token, `/documents/${id}`, { method: "DELETE" });
 }
+
+// --- TTS (lectura por voz, bajo demanda) -----------------------------------
+// POST /tts {text, voice} (Bearer) -> audio/wav (blob). El backend es un proxy
+// autenticado al servicio XTTS-v2; si está caído responde 503 y aquí lanzamos
+// ApiError con el detalle, para que la UI muestre un error claro sin romper el chat.
+export type Voice = "ana" | "alma";
+
+export const VOICES: { id: Voice; label: string }[] = [
+  { id: "ana", label: "Ana" },
+  { id: "alma", label: "Alma" },
+];
+
+export async function synthesize(
+  token: string,
+  text: string,
+  voice: Voice,
+): Promise<Blob> {
+  let res: Response;
+  try {
+    res = await fetch(`${API_URL}/tts`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ text, voice }),
+    });
+  } catch {
+    throw networkError();
+  }
+  if (res.status === 401) {
+    throw new ApiError(401, "Tu sesión expiró.");
+  }
+  if (!res.ok) {
+    let message = `No se pudo generar el audio (${res.status}).`;
+    try {
+      const body = (await res.json()) as { detail?: string };
+      if (body?.detail) message = body.detail;
+    } catch {
+      /* sin cuerpo JSON: nos quedamos con el genérico */
+    }
+    throw new ApiError(res.status, message);
+  }
+  return await res.blob();
+}

@@ -133,6 +133,31 @@ services:
       - auth_password
       - postgres_password
 
+  # Servicio TTS (XTTS-v2) — contenedor propio con GPU, aislado del backend.
+  # Sin 'ports': solo accesible en la red interna de compose (lo consume la api como
+  # proxy autenticado; el frontend nunca le habla directo). El modelo (~1.8GB) se
+  # cachea en el volumen tts_cache para no re-descargarlo en cada recreación.
+  tts:
+    build: ./tts
+    environment:
+      - COQUI_TOS_AGREED=1
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    volumes:
+      - tts_cache:/root/.local/share/tts
+    healthcheck:
+      # /health responde 'loading' hasta que el modelo está en GPU; 'ok' cuando listo.
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if 'ok' in urllib.request.urlopen('http://localhost:8000/health').read().decode() else 1)"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 300s   # primera vez descarga ~1.8GB + carga el modelo
+
   # Servicio efímero solo para tests. Se lanza con:
   #   docker compose run --rm tests
   # Construye con dev deps (pytest) y apunta a una BD aparte (nexaagent_test).
@@ -176,3 +201,4 @@ volumes:
   pgdata:
   ollama_data:
   hf_cache:
+  tts_cache:
